@@ -1,0 +1,82 @@
+provider "aws" {
+  access_key = ""
+  secret_key = ""
+  region     = "ap-south-1"
+}
+
+resource "aws_vpc" "vpc1" {
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
+
+  tags = {
+    Name = "vpc1"
+  }
+}
+
+resource "aws_subnet" "sn1" {
+  vpc_id     = aws_vpc.vpc1.id
+  cidr_block = "10.0.0.0/24"
+
+  tags = {
+    Name = "sn1"
+  }
+}
+
+resource "aws_subnet" "sn2" {
+  vpc_id     = aws_vpc.vpc1.id
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "sn2"
+  }
+}
+
+resource "aws_subnet" "sn3" {
+  vpc_id     = aws_vpc.vpc1.id
+  cidr_block = "10.0.2.0/24"
+
+  tags = {
+    Name = "sn3"
+  }
+}
+
+resource "aws_subnet" "sn4" {
+  vpc_id     = aws_vpc.vpc1.id
+  cidr_block = "10.0.3.0/24"
+
+  tags = {
+    Name = "sn4"
+  }
+}
+
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "main"
+  }
+}
+
+
+resource "aws_network_interface" "eni1" {
+  subnet_id   = aws_subnet.sn1.id
+  private_ips = ["10.0.0.15"]
+
+  tags = {
+    Name = "eni1"
+  }
+}
+
+resource "aws_instance" "i2" {
+  ami           = "ami-svjkhsjvdhjshvj"
+  instance_type = "t3a.small"
+
+  network_interface {
+    network_interface_id = aws_network_interface.eni1.id
+    device_index         = 0
+  }
+
+  credit_specification {
+    cpu_credits = "unlimited"
+  }
+}
